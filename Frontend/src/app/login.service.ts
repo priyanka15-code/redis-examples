@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import {  Store } from '@ngrx/store';
+import { Router } from '@angular/router';
+import { CookieService } from 'ngx-cookie-service';
 import { AuthState } from './store/auth/auth.reducer';
 import * as AuthActions from './store/auth/auth.actions';
-import { Store } from '@ngrx/store';
-import { CookieService } from 'ngx-cookie-service';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -14,9 +15,7 @@ export class LoginService {
   private apiUrl = 'http://localhost:3000/api/auth';
   private cookieKey = 'authToken';
 
-  constructor(private http: HttpClient, private store: Store<AuthState>,  private cookieService: CookieService) {}
-
-
+  constructor(private http: HttpClient, private store: Store<{ auth: AuthState }>, private router: Router, private cookieService: CookieService) {}
 
   login(username: string, password: string): Observable<{ token: string }> {
     return this.http.post<{ token: string }>(`${this.apiUrl}/login`, { username, password });
@@ -25,7 +24,6 @@ export class LoginService {
   register(username: string, password: string, email: string): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(`${this.apiUrl}/register`, { username, password, email });
   }
-
 
   logout(): void {
     this.cookieService.delete(this.cookieKey);
@@ -40,6 +38,7 @@ export class LoginService {
     const token = this.getToken();
     return !!token;
   }
+
   setToken(token: string): void {
     this.cookieService.set(this.cookieKey, token);
   }

@@ -1,6 +1,5 @@
 import { createReducer, on, Action } from '@ngrx/store';
 import * as AuthActions from './auth.actions';
-import { CookieService } from 'ngx-cookie-service';
 
 export interface AuthState {
   token: string | null;
