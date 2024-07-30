@@ -1,0 +1,5 @@
+<!-- toast.component.html -->
+<div *ngIf="message" [ngClass]="{'bg-gray-500 shadow-lg': type === 'success', 'bg-red-500': type === 'error'}" class="fixed w-auto h-8 bottom-auto right-auto  p-2 mb-3 rounded">
+    {{ message }}
+  </div>
+  
