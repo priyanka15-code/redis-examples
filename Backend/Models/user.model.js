@@ -10,6 +10,7 @@ const generateUserId = async () => {
   const date = moment().format('YYYYMMDD');
   const time = moment().format('HHmmss');
   const userId = `T${paddedCounter}-${date}-${time}`;
+  await redisClient.quit();
   return userId;
 };
 
@@ -20,7 +21,8 @@ const userSchema = new mongoose.Schema({
   },
   username: {
     type: String,
-    required: true
+    required: true,
+    unique: true
   },
   password: {
     type: String,
@@ -28,25 +30,35 @@ const userSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: true
+    required: true,
+    unique: true
   }
 });
 
 userSchema.pre('save', async function (next) {
-  if (this.isModified('password') || this.isNew) {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-  }
+  const user = this;
 
-  if (this.isNew) {
+  if (user.isModified('password') || user.isNew) {
     try {
-      this.userId = await generateUserId();
+      const existingUser = await mongoose.models.User.findOne({ username: user.username });
+      if (existingUser) {
+        return next(new Error('Username already exists'));
+      }
+
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(user.password, salt);
+
+      if (user.isNew) {
+        user.userId = await generateUserId();
+      }
+
+      next();
     } catch (err) {
       return next(err);
     }
+  } else {
+    next();
   }
-
-  next();
 });
 
 userSchema.methods.comparePassword = async function (password) {

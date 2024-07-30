@@ -29,11 +29,15 @@ export class LoginComponent implements OnInit {
   login(): void {
     this.store.dispatch(AuthActions.login({username: this.username, password: this.password}));
     this.showToastMessage('Login Successful', 'success');
+    console.log('Login Successful');
+    
   }
 
   register(): void {
     this.store.dispatch(AuthActions.register({username: this.username, password: this.password, email: this.email}));
     this.showToastMessage('Registration Successful', 'success');
+    console.log('Registration Successful');
+    
   }
 
   showToastMessage(message: string, type: 'success' | 'error'): void {
