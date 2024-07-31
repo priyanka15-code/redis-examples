@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const jwtUtils = require('../Utils/jwt.utils');
+const jwt = require('jsonwebtoken');
+const secret = process.env.SECRET_KEY;
 
-module.exports = (redisClient) => {
+module.exports = () => {
   const User = require('../Models/user.model');
 
   const getExWord = () => new Date().getTime().toString();
@@ -32,6 +34,19 @@ module.exports = (redisClient) => {
       console.error('Login error:', error);
       res.status(500).json({ message: 'Internal server error' });
     }
+  });
+
+  router.post('/validate-token', (req, res) => {
+    const { token } = req.body;
+    if (!token) {
+      return res.json({ valid: false });
+    }
+    jwt.verify(token, secret, (err) => {
+      if (err) {
+        return res.json({ valid: false });
+      }
+      res.json({ valid: true });
+    });
   });
 
   router.post('/register', async (req, res) => {

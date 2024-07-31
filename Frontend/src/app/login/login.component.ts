@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { AuthState } from '../store/auth/auth.reducer';
-import * as AuthActions from '../store/auth/auth.actions';
 import { Router } from '@angular/router';
+import { LoginService } from '../login.service';
+import { ToastComponent } from '../toast/toast.component';
 
 @Component({
   selector: 'app-login',
@@ -18,7 +17,7 @@ export class LoginComponent implements OnInit {
   toastMessage: string = '';
   toastType: 'success' | 'error' = 'success';
 
-  constructor(private store: Store<AuthState>, private router: Router) {}
+  constructor(private loginService: LoginService, private router: Router) {}
 
   ngOnInit(): void {}
 
@@ -27,16 +26,28 @@ export class LoginComponent implements OnInit {
   }
 
   login(): void {
-    this.store.dispatch(AuthActions.login({ username: this.username, password: this.password }));
-    this.showToastMessage('Login Successful', 'success');
-    console.log('Login Successful');
-    this.router.navigate(['/dashboard']);
+    this.loginService.login(this.username, this.password).subscribe({
+      next: () => {
+        this.showToastMessage('Login Successful', 'success');
+        this.router.navigate(['/dashboard']);
+      },
+      error: (err) => {
+        this.showToastMessage('Login Failed', 'error');
+        console.error(err);
+      }
+    });
   }
 
   register(): void {
-    this.store.dispatch(AuthActions.register({ username: this.username, password: this.password, email: this.email }));
-    this.showToastMessage('Registration Successful', 'success');
-    console.log('Registration Successful');
+    this.loginService.register(this.username, this.password, this.email).subscribe({
+      next: () => {
+        this.showToastMessage('Registration Successful', 'success');
+      },
+      error: (err) => {
+        this.showToastMessage('Registration Failed', 'error');
+        console.error(err);
+      }
+    });
   }
 
   showToastMessage(message: string, type: 'success' | 'error'): void {

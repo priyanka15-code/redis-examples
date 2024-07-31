@@ -1,18 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const moment = require('moment');
-const { initRedisClient } = require('./redis');
-
-const generateUserId = async () => {
-  const redisClient = await initRedisClient();
-  const counter = await redisClient.incr('userIdCounter');
-  const paddedCounter = String(counter).padStart(5, '0');
-  const date = moment().format('YYYYMMDD');
-  const time = moment().format('HHmmss');
-  const userId = `T${paddedCounter}-${date}-${time}`;
-  await redisClient.quit();
-  return userId;
-};
+const { generateUserId } = require('./redis');
 
 const userSchema = new mongoose.Schema({
   userId: {
@@ -22,7 +11,7 @@ const userSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
-    unique: true
+    
   },
   password: {
     type: String,
@@ -31,7 +20,7 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    unique: true
+    
   }
 });
 

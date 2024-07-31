@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const { initRedisClient } = require('./Models/redis');
+
 require('dotenv').config();
 
 const app = express();

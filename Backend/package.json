@@ -2,9 +2,11 @@
     "name": "node-backend",
     "version": "1.0.0",
     "scripts": {
-        "start": "node app.js"
+        "start": "node app.js",
+        "dev": "nodemon app.js"
     },
     "dependencies": {
+        "axios": "^1.7.2",
         "bcrypt": "^5.1.1",
         "body-parser": "^1.19.0",
         "cors": "^2.8.5",
@@ -13,6 +15,10 @@
         "jsonwebtoken": "^8.5.1",
         "moment": "^2.30.1",
         "mongoose": "^5.10.18",
-        "redis": "^4.6.15"
+        "redis": "^4.7.0",
+        "util": "^0.12.5"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.4"
     }
 }
