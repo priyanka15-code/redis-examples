@@ -8,6 +8,7 @@ import { LoginService } from 'src/app/login.service';
 })
 export class DashboadComponent implements OnInit {
   users: any[] = [];
+  business: any[] =[];
   filteredUsers: any[] = [];
   loading: boolean = false;
   showToast: boolean = false;
@@ -28,13 +29,42 @@ export class DashboadComponent implements OnInit {
   constructor(private api: LoginService) {}
 
   ngOnInit(): void {
-    this.api.getusers().subscribe(users => {
-      this.users = users;
-      this.filteredUsers = [...this.users];
+   
       this.loadUsers();
-    });
+      this.loadBusiness();
+    
   }
 
+  loadUsers(): void {
+    this.api.getUsers().subscribe((users: any[]) => {
+      this.users = users;
+      this.filterUsers();
+    });
+  }
+  filterUsersByBusiness(businessId: string): void {
+    this.loading = true;
+    this.api.filterByBusiness(businessId).subscribe(
+      (filteredUsers: any[]) => {
+        this.filteredUsers = filteredUsers;
+        this.loading = false;
+      },
+      error => {
+        console.error('Error filtering users by business:', error);
+        this.showToastMessage('Error filtering users', 'error');
+        this.loading = false;
+      }
+    );
+  }
+
+  async triggerRequests() {
+    await this.api.processRequests();
+  }
+
+ loadBusiness(): void {
+  this.api.getBusiness().subscribe((business: any[]) => {
+    this.business = business;
+  });
+}
   toggleSearch(field: 'userId' | 'username' | 'email'): void {
     this.searchBy = this.searchBy === field ? null : field;
     this.filterUsers();
@@ -81,26 +111,29 @@ export class DashboadComponent implements OnInit {
     setTimeout(() => this.showToast = false, 3000);
   }
 
-  sendMultipleRequests(): void {
-    this.loading = true;
-    this.api.sendMultipleRequests().subscribe({
-      next: (response) => {
-        console.log('All requests completed:', response);
-        this.loading = false;
-        this.api.getusers().subscribe(users => {
-          this.users = users;
-          this.filterUsers(); 
-          this.showToastMessage('Multi ', 'success');
-        });
+  sendUserRequests(): void {
+    this.api.sendUserRequests().subscribe(
+      responses => {
+        console.log('All user requests completed:', responses);
       },
-      error: (err) => {
-        console.error('Error in requests:', err);
-        this.loading = false;
+      error => {
+        console.error('Error in user requests:', error);
       }
-    });
+    );
   }
 
-  loadUsers(): void {
+  sendBusinessRequests(): void {
+    this.api.sendBusinessRequests().subscribe(
+      responses => {
+        console.log('All business requests completed:', responses);
+      },
+      error => {
+        console.error('Error in business requests:', error);
+      }
+    );
+  }
+
+ /*  loadUsers(): void {
     if (this.loading || !this.hasMore) return;
 
     this.loading = true;
@@ -120,7 +153,8 @@ export class DashboadComponent implements OnInit {
       }
     );
   }
-
+ */
+  
   onPageChange(page: number): void {
     this.page = page;
     this.loadUsers(); 

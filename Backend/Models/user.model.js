@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const moment = require('moment');
 const { generateUserId } = require('./redis');
 
 const userSchema = new mongoose.Schema({
@@ -11,7 +10,6 @@ const userSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
-    
   },
   password: {
     type: String,
@@ -20,7 +18,6 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    
   }
 });
 

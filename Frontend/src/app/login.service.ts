@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { catchError, forkJoin, map, Observable, of } from 'rxjs';
+import axios from 'axios';
 
 @Injectable({
   providedIn: 'root'
@@ -61,29 +62,103 @@ export class LoginService {
     this.cookieService.set(this.cookieKey, token);
   }
 
-  getusers(): Observable<any[]> {
+  getUsers(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}users/get`);
+  }
+
+  getBusiness(): Observable<any[]>{
+    return this.http.get<any[]>(`${this.apiUrl}business/get`);
   }
 
   deleteUser(_id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}users/delete/${_id}`);
   }
 
-  sendMultipleRequests(): Observable<any[]> {
-    const numRequests = 100; 
+  private sendRequests(endpoint: string, createPayload: (index: number, timestamp: number) => any): Observable<any[]> {
+    const numRequests = 10; 
     const requests = [];
 
     for (let i = 0; i < numRequests; i++) {
       const timestamp = Date.now();
-      const request = this.http.post<{ message: string }>(`${this.apiUrl}auth/register`, {
-        username: `user${i}_${timestamp}`,
-        password: 'password123',
-        email: `user${i}_${timestamp}@example.com`
-      });
+      const payload = createPayload(i, timestamp);
+      const request = this.http.post<{ message: string }>(`${this.apiUrl}${endpoint}`, payload);
       requests.push(request);
     }
 
     return forkJoin(requests);
+  }
+
+  sendUserRequests(): Observable<any[]> {
+    const createUserPayload = (index: number, timestamp: number) => ({
+      username: `user${index}_${timestamp}`,
+      password: 'password123',
+      email: `user${index}_${timestamp}@example.com`
+    });
+
+    return this.sendRequests('auth/register', createUserPayload);
+  }
+
+  sendBusinessRequests(): Observable<any[]> {
+    const createBusinessPayload = (index: number, timestamp: number) => ({
+      businessname: `business${index}_${timestamp}`
+    });
+
+    return this.sendRequests('business/register', createBusinessPayload);
+  }
+
+  async fetchBusinessIds(): Promise<string[]> {
+    try {
+      const response = await axios.get(`${this.apiUrl}business/get`);
+      return response.data.map((business: { _id: string; }) => business._id);
+    } catch (error: any) {
+      console.error('Error fetching business IDs:', error.response ? error.response.data : error.message);
+      return [];
+    }
+  }
+
+  async sendRequestsSequentially(businessId: string, index: number, numberOfRequests: number): Promise<void> {
+    for (let i = 0; i < numberOfRequests; i++) {
+      const uniqueIndex = `${index}-${i}`; 
+      const timestamp = new Date().toISOString(); 
+      
+      const requestPayload = {
+        username: `user${uniqueIndex}_${timestamp}`,
+        password: 'password123',
+        email: `user${uniqueIndex}_${timestamp}@example.com`,
+        business: businessId,
+      };
+
+      try {
+        const response = await axios.post(`${this.apiUrl}merge/register`, requestPayload);
+        console.log(`Response for request ${i} with businessId ${businessId}:`, response.data);
+      } catch (error: any) {
+        console.error(`Error for request ${i} with businessId ${businessId}:`, error.response ? error.response.data : error.message);
+      }
+    }
+  }
+
+  async processRequests(): Promise<void> {
+    const businessIds = await this.fetchBusinessIds();
+
+    if (businessIds.length > 0) {
+      console.log('Sending requests for the first business ID...');
+      await this.sendRequestsSequentially(businessIds[0], 1, 10);
+
+      if (businessIds.length > 1) {
+        console.log('Sending requests for the second business ID...');
+        await this.sendRequestsSequentially(businessIds[1], 2, 10);
+      } else {
+        console.error('Only one business ID found.');
+      }
+    } else {
+      console.error('No business IDs found.');
+    }
+
+    console.log('All requests sent.');
+  }
+
+  filterByBusiness(businessId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}merge/filterByBusiness/${businessId}`);
   }
   getUsersPaginated(page: number, limit: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}users/get?page=${page}&limit=${limit}`);
