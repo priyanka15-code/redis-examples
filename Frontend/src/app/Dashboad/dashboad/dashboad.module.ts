@@ -34,6 +34,13 @@ const routes: Routes = [
             (m) => m.UserRequestModule
           ),
       },
+      {
+        path: "infinite",
+        loadChildren: () =>
+          import("../dashboad/pages/infinite-scroll/infinite-scroll.module").then(
+            (m) => m.InfiniteScrollModule
+          )
+      }
     ],
   },
 ];
