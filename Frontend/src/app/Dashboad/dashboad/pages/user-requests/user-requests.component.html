@@ -1,0 +1,66 @@
+<div class="p-6 ">
+<div class="mb-6 flex flex-col lg:flex-row justify-between items-center mt-6">
+  <div class="flex items-center space-x-4">
+    <button
+      (click)="triggerRequests()"
+      class="bg-gray-700 text-white py-2 px-4 rounded shadow hover:bg-gray-600 transition"
+    >
+      Send Multiple User Requests
+    </button>
+    <div class="mt-6 lg:mt-0">
+      <select [(ngModel)]="selectedBusinessId" (change)="filterUsers()" class="bg-gray-200 text-gray-900 py-2 px-4 rounded shadow">
+        <option [value]="''">All Businesses</option>
+        <option *ngFor="let business of businessIds" [value]="business._id">{{ business.businessname }}</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<app-toast
+  *ngIf="showToast"
+  [message]="toastMessage"
+  [type]="toastType"
+  class="fixed top-4 right-4"
+></app-toast>
+
+<div class="flex flex-col h-full mt-6">
+  <div class="flex-1 overflow-auto">
+    <div class="max-h-[calc(100vh-150px)] overflow-y-auto">
+      <table
+        class="w-full text-sm text-left text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 shadow-md"
+      >
+        <thead
+          class="text-xs text-gray-100 uppercase bg-gray-200 dark:bg-gray-900 sticky top-0"
+        >
+          <tr>
+            <th scope="col" class="px-6 py-3">Business Name</th>
+            <th scope="col" class="px-6 py-3">UBId</th>
+            <th scope="col" class="px-6 py-3">UserId</th>
+            <th scope="col" class="px-6 py-3">UserName</th>
+            <th scope="col" class="px-6 py-3">Email</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr
+            *ngFor="let item of merge"
+            class="bg-white dark:bg-gray-800 even:bg-gray-100 dark:even:bg-gray-700 border-b dark:border-gray-700"
+          >
+            <th
+              scope="row"
+              class="px-6 py-4 font-medium text-gray-900 dark:text-white"
+            >
+              {{ getBusinessName(item.business) }}
+            </th>
+            <td class="px-6 py-4">{{ item.UBID }}</td>
+            <td class="px-6 py-4">{{ item.userId }}</td>
+            <td class="px-6 py-4">{{ item.username }}</td>
+            <td class="px-6 py-4">{{ item.email }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="py-4"></div>
+</div>
+</div>

@@ -52,7 +52,7 @@ router.get('/get', async (req, res) => {
     }
   });
 
-router.get('/filterByBusiness/:businessId', async (req, res) => {
+  router.get('/filterByBusiness/:businessId', async (req, res) => {
     const { businessId } = req.params;
 
     try {
@@ -65,12 +65,27 @@ router.get('/filterByBusiness/:businessId', async (req, res) => {
                 $match: { business: mongoose.Types.ObjectId(businessId) }
             },
             {
+                $lookup: {
+                    from: 'businesses', 
+                    localField: 'business',
+                    foreignField: '_id',
+                    as: 'businessDetails'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$businessDetails',
+                    preserveNullAndEmptyArrays: true 
+                }
+            },
+            {
                 $project: {
                     _id: 0,
                     username: 1,
                     email: 1,
                     userId: 1,
-                    UBID: 1
+                    UBID: 1,
+                    businessName: '$businessDetails.businessname'
                 }
             }
         ];
@@ -83,5 +98,6 @@ router.get('/filterByBusiness/:businessId', async (req, res) => {
         res.status(500).json({ message: 'Error fetching data', error: err.message });
     }
 });
+
 
 module.exports = router;

@@ -70,6 +70,10 @@ export class LoginService {
     return this.http.get<any[]>(`${this.apiUrl}business/get`);
   }
 
+  getMerge(): Observable<any[]>{
+    return this.http.get<any[]>(`${this.apiUrl}merge/get`);
+  }
+
   deleteUser(_id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}users/delete/${_id}`);
   }

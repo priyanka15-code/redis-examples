@@ -16,7 +16,7 @@ import { SharedModule } from './shared/shared.module';
     FormsModule,
     AppRoutingModule,
     SharedModule  ,
-    FormsModule
+    
   ],
   providers: [CookieService],
   bootstrap: [AppComponent]
