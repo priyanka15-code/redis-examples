@@ -1,13 +1,12 @@
-// src/app/Dashboad/dashboad/pages/infinite-scroll/infinite-scroll.component.ts
 import { Component, OnInit } from '@angular/core';
 import { LoginService } from 'src/app/login.service';
 
 @Component({
-  selector: 'app-infinite-scroll',
-  templateUrl: './infinite-scroll.component.html',
-  styleUrls: ['./infinite-scroll.component.css']
+  selector: 'app-scrolling',
+  templateUrl: './scrolling.component.html',
+  styleUrls: ['./scrolling.component.css']
 })
-export class InfiniteScrollComponent implements OnInit {
+export class ScrollingComponent implements OnInit{
   items: string[] = [];
   isLoading = false;
   currentPage = 1;
@@ -44,3 +43,5 @@ export class InfiniteScrollComponent implements OnInit {
     this.appendData();
   }
 }
+
+

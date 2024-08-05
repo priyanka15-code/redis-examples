@@ -3,7 +3,12 @@ module.exports = {
     "./src/**/*.{html,ts}"
   ],
   theme: {
-    extend: {},
+    extend: {
+      height: {
+        '120': '30rem', 
+      },
+    },
   },
+  variants: {},
   plugins: [],
 }

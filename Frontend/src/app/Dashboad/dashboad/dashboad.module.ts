@@ -37,8 +37,8 @@ const routes: Routes = [
       {
         path: "infinite",
         loadChildren: () =>
-          import("../dashboad/pages/infinite-scroll/infinite-scroll.module").then(
-            (m) => m.InfiniteScrollModule
+          import("../dashboad/pages/scrolling/scrolling.module").then(
+            (m) => m.ScrollingModule
           )
       }
     ],
@@ -51,6 +51,7 @@ const routes: Routes = [
     CommonModule,
     FormsModule,
     RouterModule.forChild(routes),
+    
   ],
 })
 export class DashboardModule {}
