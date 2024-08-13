@@ -1,0 +1,54 @@
+    
+    <div class="p-6">
+    <div class="mb-6 ml-6  flex justify-between items-center">
+      <button (click)="sendBusinessRequests()" class="bg-gray-700 text-white py-2 px-4 rounded shadow hover:bg-gray-600 transition">Send Multiple Business Requests</button>
+<!--       <button (click)="triggerRequests()" class="bg-gray-700 text-white py-2 px-4 rounded shadow hover:bg-gray-600 transition">Send Multiple Merge Requests</button>
+ -->     
+    </div>
+    <app-toast *ngIf="showToast" [message]="toastMessage" [type]="toastType" class="absolute top-0 right-0 mt-4 mr-4"></app-toast>
+
+   
+    <div class="flex flex-col h-full">
+      <div class="flex-1 overflow-auto">
+        <div class="max-h-[calc(100vh-150px)] overflow-y-auto">
+          <table class="w-full text-sm text-left text-gray-100 dark:text-gray-200 bg-white dark:bg-gray-800 shadow-md">
+            <thead class="text-xs text-gray-100 uppercase bg-gray-200 dark:bg-gray-900 sticky top-0">
+                <tr>
+                  <th scope="col" class="px-6 py-3">
+                      <span>BusinessId</span>
+                  </th>
+                  <th scope="col" class="px-6 py-3">
+                      <span>BusinessName</span>
+                   </th>
+              </thead>
+              
+            <tbody>
+              <tr *ngFor="let biz of business" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                <th scope="row" class="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                  {{ biz.businessId }}
+                </th>
+                <td class="px-6 py-4">{{ biz.businessname }}</td>
+               <!--  <td class="px-6 py-4">{{ user.email }}</td>
+                <td class="px-6 py-4">
+                  <button (click)="onDelete(user._id)" type="button" class="text-red-600 hover:text-red-500 transition">
+                    <i class="fa-regular fa-trash-can"></i>
+                  </button> -->
+              <!--   </td> -->
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <div class="py-4">
+        <app-pagination 
+          [currentPage]="page" 
+          [totalPages]="totalPages" 
+          (pageChange)="onPageChange($event)">
+        </app-pagination>
+      </div>
+    </div>
+  
+    </div>
+
+  

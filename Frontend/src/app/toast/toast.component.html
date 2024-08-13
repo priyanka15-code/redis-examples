@@ -1,0 +1,15 @@
+<div *ngIf="message" 
+     class="fixed bottom-4 right-4 w-auto max-w-xs p-3 rounded-lg shadow-lg transition-transform transform translate-y-0 z-50"
+     [ngClass]="{
+       'bg-gray-200 text-black': type === 'success', 
+       'bg-red-500 text-white': type === 'error'
+     }">
+    <div class="flex items-center">
+        <!-- Icon for success or error -->
+        <div class="mr-2">
+          <i *ngIf="type === 'success'" class="fa-solid fa-check-circle"></i>
+          <i *ngIf="type === 'error'" class="fa-solid fa-exclamation-circle"></i>
+        </div>
+        <span>{{ message }}</span>
+    </div>
+</div>

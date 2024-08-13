@@ -1,0 +1,14 @@
+<div class="flex justify-center mt-4">
+    <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1" class="px-4 py-2 bg-gray-600 text-white rounded-l-md">
+      Previous
+    </button>
+  
+    <span class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md">
+      Page {{ currentPage }} of {{ totalPages }}
+    </span>
+  
+    <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === totalPages" class="px-4 py-2 bg-gray-600 text-white rounded-r-md">
+      Next
+    </button>
+  </div>
+  

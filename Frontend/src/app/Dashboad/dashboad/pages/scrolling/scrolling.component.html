@@ -1,0 +1,14 @@
+<div
+  class=" h-120 overflow-y-scroll flex flex-col items-center shadow-lg    " 
+  infiniteScroll
+  [infiniteScrollDistance]="2"
+  [infiniteScrollThrottle]="500"
+  (scrolled)="onScroll()"
+  [scrollWindow]="false"
+>
+  <div class=" p-1 m-2 w-1/5 border text-center bg-white text-xl shadow-xl" *ngFor="let item of items">
+    {{ item }}
+  </div>
+
+  <div *ngIf="isLoading">Loading...</div>
+</div>
