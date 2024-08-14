@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const { generateUserId, checkUserInCache, cacheUser } = require('./redis');
-const FailedRegistration = require('./fail.model'); 
+const { generateUserId } = require('./redis');
+const FailedRegistration = require('./fail.model');
 
 const userSchema = new mongoose.Schema({
   userId: {
@@ -32,66 +32,41 @@ userSchema.pre('save', async function (next) {
 
   if (user.isModified('password') || user.isNew) {
     try {
-      const cachedUser = await checkUserInCache(user.username);
-
-      if (cachedUser) {
-       /*  if (user.registrationStatus === 'fail') {
-          // Store failed registration in a separate collection
-          await FailedRegistration.create({
-            userId: await generateUserId(),
-            username: user.username,
-            email: user.email,
-            failureReason: 'Registration failed during save process'
-          });        
-        } */
-        throw new Error('Username already exists (from cache)');
-        
+      const existingUser = await mongoose.models.User.findOne({ username: user.username });
+      if (existingUser) {
+        const err = new Error('Username already exists');
+        err.registrationStatus = 'fail';
+        throw err;
       }
+      user.userId = await generateUserId();
 
       const salt = await bcrypt.genSalt(10);
       user.password = await bcrypt.hash(user.password, salt);
 
-      if (user.isNew) {
-        user.userId = await generateUserId();
-        user.registrationStatus = 'success';
-      }
+      user.registrationStatus = 'success';  
 
       next();
     } catch (err) {
-      user.registrationStatus = 'fail';
+      
+      const failedUserId = user.userId || await generateUserId();
+      try {
         await FailedRegistration.create({
-          userId: await generateUserId(),
+          userId: failedUserId,
           username: user.username,
           email: user.email,
-          failureReason: 'Registration failed during save process'
-        });       
-      next(err);
+          failureReason: err.message || 'Registration failed during save process'
+        });
+      } catch (saveError) {
+        return next(saveError);
+      }
+
+      return next(err);
     }
   } else {
     next();
   }
 });
 
-/* userSchema.post('save', async function (user, next) {
-  try {
-    if (user.registrationStatus === 'success') {
-      // Cache the user in Redis after successful registration
-      await cacheUser(user);
-    } else if (user.registrationStatus === 'fail') {
-      // Store failed registration in a separate collection
-      await FailedRegistration.create({
-        userId: await generateUserId(),
-        username: user.username,
-        email: user.email,
-        failureReason: 'Registration failed during save process'
-      });
-    }
-    next();
-  } catch (err) {
-    return next(err);
-  }
-});
- */
 userSchema.methods.comparePassword = async function (password) {
   try {
     return await bcrypt.compare(password, this.password);
