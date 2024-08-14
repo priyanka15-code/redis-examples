@@ -72,3 +72,28 @@ const checkUserInCache = async (username) => {
 module.exports = { initRedisClient, generateUserId, generateBusinessId, generateUBId, cacheUser, checkUserInCache };
 
 
+/* const generateUserId = async () => {
+  const redisClient = await initRedisClient();
+
+  try {
+    // Atomic increment operation
+    const counter = await redisClient.incr('userIdCounter');
+
+    if (counter === null) {
+      throw new Error('Failed to increment counter');
+    }
+
+    // Format the counter and create the user ID
+    const paddedCounter = String(counter).padStart(5, '0');
+    const date = moment().format('YYYYMMDD');
+    const time = moment().format('HHmmss');
+    const userId = `T${paddedCounter}-${date}-${time}`;
+
+    return userId;
+  } finally {
+    await redisClient.quit();
+  }
+};
+
+
+ */

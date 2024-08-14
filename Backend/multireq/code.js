@@ -71,9 +71,9 @@ const generateId = async (keyPrefix, businessId = '') => {
 };
 
 const generateUserId = async (businessId) => generateId('U', businessId);
-const generateBusinessId = async () => generateId('B');
+/* const generateBusinessId = async () => generateId('B');
 const generateUBId = async () => generateId('UB');
-
+ */
 
 
 // Cache user in Redis

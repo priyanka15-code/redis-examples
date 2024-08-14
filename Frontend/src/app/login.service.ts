@@ -45,9 +45,11 @@ export class LoginService {
     return this.http.post<{ message: string }>(`${this.apiUrl}auth/register`, { username, password, email });
   }
 
-  registerbusiness(username: string, password: string, email: string, businessName: string, userId?: string): Observable<{ message: string }> {
-    return this.http.post<{ message: string }>(`${this.apiUrl}merge/register`, { username, password, email, business: businessName, userId });
+  registerbusiness(username: string, password: string, email: string, _id: string, userId?: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}merge/register`, { username, password, email, business: _id, userId });
   }
+  
+  
   
   
 
@@ -147,20 +149,22 @@ export class LoginService {
       }
     }
   }
-
+  
   async processRequests(): Promise<void> {
     const businessIds = await this.fetchBusinessIds();
 
-    if (businessIds.length > 0) {
+    if (businessIds.length > 3) {
+      console.log('Sending requests for the first business ID...');
+      await this.sendRequestsSequentially(businessIds[0], 1, 5);
+      console.log('Sending requests for the 2nd business ID...');
+      await this.sendRequestsSequentially(businessIds[1], 1, 5);
       console.log('Sending requests for the first business ID...');
       await this.sendRequestsSequentially(businessIds[0], 1, 10);
+      console.log('Sending requests for the 3rd business ID...');
+      await this.sendRequestsSequentially(businessIds[2], 1, 4);
+     
 
-      if (businessIds.length > 1) {
-        console.log('Sending requests for the second business ID...');
-        await this.sendRequestsSequentially(businessIds[1], 2, 10);
-      } else {
-        console.error('Only one business ID found.');
-      }
+      
     } else {
       console.error('No business IDs found.');
     }

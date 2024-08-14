@@ -106,9 +106,9 @@ const fetchBusinessIds = async () => {
   const businessIds = await fetchBusinessIds();
 
   if (businessIds.length >= 2) {
-    await sendBatchRequests([businessIds[0], businessIds[1]], 5, 'http://localhost:3000/api/auth/register', createUserPayload);
-    await sendBatchRequests([businessIds[0], businessIds[1]], 5, 'http://localhost:3000/api/business/register', createBusinessPayload);
-    await sendBatchRequests([businessIds[0], businessIds[1]], 5, 'http://localhost:3000/api/merge/register', createBusinessPayload);
+    await sendBatchRequests([businessIds[0], businessIds[1], businessIds[0]], 5, 'http://localhost:3000/api/auth/register', createUserPayload);
+    await sendBatchRequests([businessIds[0], businessIds[1], businessIds[0]], 5, 'http://localhost:3000/api/business/register', createBusinessPayload);
+    await sendBatchRequests([businessIds[0], businessIds[1], businessIds[0]], 5, 'http://localhost:3000/api/merge/register', createBusinessPayload);
   
   } else {
     console.error('Not enough business IDs to perform the test.');

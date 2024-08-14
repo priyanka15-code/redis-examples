@@ -42,18 +42,21 @@ const sendRequestsSequentially = async (businessId, index, numberOfRequests) => 
 (async () => {
   const businessIds = await fetchBusinessIds();
 
-  if (businessIds.length > 0) {
+  if (businessIds.length >= 3) {
     console.log('Sending requests for the first business ID...');
-    await sendRequestsSequentially(businessIds[0], 1, 10);
+    await sendRequestsSequentially(businessIds[0], 1, 5);
 
-    if (businessIds.length > 1) {
-      console.log('Sending requests for the second business ID...');
-      await sendRequestsSequentially(businessIds[1], 2, 10);
-    } else {
-      console.error('Only one business ID found.');
-    }
+    console.log('Sending requests for the second business ID...');
+    await sendRequestsSequentially(businessIds[1], 2, 5);
+
+    console.log('Sending requests again for the first business ID...');
+    await sendRequestsSequentially(businessIds[0], 3, 5);
+
+    console.log('Sending requests for the third business ID...');
+    await sendRequestsSequentially(businessIds[2], 4, 5);
+
   } else {
-    console.error('No business IDs found.');
+    console.error('Not enough business IDs found to perform the test.');
   }
 
   console.log('All requests sent.');

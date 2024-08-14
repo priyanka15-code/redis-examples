@@ -15,14 +15,17 @@ export class UserRequestsComponent implements OnInit {
   toastType: 'success' | 'error' = 'success';
   businessNameMap: { [id: string]: string } = {}; 
   isModalOpen = false;
-username: string = 'abcd';
+  username: string = 'abcd';
   password: string = '1234';
   email: string = 'abcd@gmail.com';
   userId: string = '02314';
-  businessname: string = "";
+  businessId: string = "";
 
   constructor(private api: LoginService) { }
 
+  ngOnInit(): void {
+    this.fetchAllData();
+  }
 
   openModal() {
     this.isModalOpen = true;
@@ -31,13 +34,9 @@ username: string = 'abcd';
   closeModal() {
     this.isModalOpen = false;
   }
-  ngOnInit(): void {
-   this.fetchAllData()
-  }
-
 
   register(): void {
-    this.api.registerbusiness(this.username, this.password, this.email, this.userId).subscribe({
+    this.api.registerbusiness(this.username, this.password, this.email, this.businessId, this.userId).subscribe({
       next: () => {
         this.showToastMessage('Registration Successful', 'success');
       },
@@ -47,39 +46,46 @@ username: string = 'abcd';
       }
     });
   }
-  
-  fetchAllData(){
-    this.api.getMerge().subscribe((merge: any[]) => {
-      this.merge = merge;
-    });
+
+  fetchAllData(): void {
     this.api.getBusiness().subscribe((businessIds: any[]) => {
       this.businessIds = businessIds;
       this.createBusinessNameMap();
+      this.fetchUserData(); 
     });
   }
-  createBusinessNameMap() {
+
+  fetchUserData(): void {
+    this.api.getMerge().subscribe((merge: any[]) => {
+      this.merge = merge;
+      this.getBusinessName
+    });
+  }
+
+  createBusinessNameMap(): void {
     this.businessNameMap = this.businessIds.reduce((map, business) => {
       map[business._id] = business.businessname;
       return map;
     }, {});
   }
 
-
-  async triggerRequests() {
+  async triggerRequests(): Promise<void> {
     await this.api.processRequests();
     this.showToastMessage('Send Request', 'success');
-    this.fetchAllData();
+    this.fetchAllData(); // Ensure data is refreshed
   }
 
   getBusinessName(businessId: string): string {
-    return this.businessNameMap[businessId] || 'Unknown Business';
+    return this.businessNameMap[businessId] || 'Unknown Business'; // Adjusted to use business ID
   }
-  filterUsers() {
+
+  filterUsers(): void {
     if (this.selectedBusinessId) {
       this.api.filterByBusiness(this.selectedBusinessId).subscribe((merge: any[]) => {
         this.merge = merge;
-        
       });
+    } else {
+      this.fetchAllData();
     }
   }
 
