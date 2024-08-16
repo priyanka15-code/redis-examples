@@ -27,12 +27,14 @@ app.use(cors());
     const userRoute = require('./Routes/user.routes');
     const businessRoute = require('./Routes/business.routers');
     const mergeRoute = require('./Routes/mergerequest.router');
+    const backRoute = require('./Routes/back.routes')
 /*     const translateRoute = require('./Routes/translate.routes');
  */
     app.use('/api/auth', authRoute);
     app.use('/api/users', userRoute);
     app.use('/api/business', businessRoute);
     app.use('/api/merge',mergeRoute);
+    app.use('/api/back',backRoute);
 /*     app.use('/api/translate',translateRoute)
  */
 

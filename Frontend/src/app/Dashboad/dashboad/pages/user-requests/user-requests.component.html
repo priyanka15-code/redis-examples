@@ -23,7 +23,7 @@
 <app-model  [isOpen]="isModalOpen"
 [businessIds]="businessIds"
 (closeModal)="closeModal()"
-(submitFormEvent)="register()"></app-model>
+(submitFormEvent)="handleFormSubmission($event)"></app-model>
 <app-toast
   *ngIf="showToast"
   [message]="toastMessage"
@@ -42,7 +42,7 @@
         >
           <tr>
             <th scope="col" class="px-6 py-3">Business Name</th>
-            <th scope="col" class="px-6 py-3">UBId</th>
+           
             <th scope="col" class="px-6 py-3">UserId</th>
             <th scope="col" class="px-6 py-3">UserName</th>
             <th scope="col" class="px-6 py-3">Email</th>
@@ -58,9 +58,9 @@
               scope="row"
               class="px-6 py-4 font-medium text-gray-900 dark:text-white"
             >
-              {{ getBusinessName(item.business) }}
+            {{ getBusinessName(item.business).name !== 'Unknown Business' ? getBusinessName(item.business).name : item.businessname }}
             </th>
-            <td class="px-6 py-4">{{ item.UBID }}</td>
+           <!--  <td class="px-6 py-4">{{ item.UBID }}</td> -->
             <td class="px-6 py-4">{{ item.userId }}</td>
             <td class="px-6 py-4">{{ item.username }}</td>
             <td class="px-6 py-4">{{ item.email }}</td>

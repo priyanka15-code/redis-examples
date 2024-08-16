@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 // Configure your server URL
-const serverUrl = 'http://localhost:3000/api/merge/register';
+const serverUrl = 'http://localhost:3000/api/back/register';
 const businessApiUrl = 'http://localhost:3000/api/business/get';
 
 // Function to fetch business IDs

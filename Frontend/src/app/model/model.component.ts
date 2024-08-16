@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, SimpleChanges, OnChanges } from '@angular/core';
 
 @Component({
   selector: 'app-model',
@@ -12,19 +12,32 @@ export class ModelComponent {
   @Output() submitFormEvent = new EventEmitter<any>();
 
   form = {
-    username: 'abcd',
-    password: '1234',
-    email: 'abcd@gmail.com',
-    businessName: '',
-    userId: '00213'
+    username: '',
+    password: '',
+    email: '',
+    businessId: '', 
+    userId: ''
   };
 
   close() {
     this.closeModal.emit();
   }
+  onBusinessChange(businessId: string): void {
+    this.form.businessId = businessId;
+  }
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['businessIds'] && this.isOpen) {
+      console.log('Business IDs:', this.businessIds);
+      this.initializeForm();
+    }
+  }
 
 
-submitForm() {
+  initializeForm(): void {
+    this.form.businessId = this.businessIds[0]._id;
+  }
+
+  submitForm() {
     console.log('Form Data:', this.form); 
     this.submitFormEvent.emit(this.form);
     this.close();

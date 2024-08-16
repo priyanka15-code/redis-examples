@@ -40,13 +40,21 @@ const routes: Routes = [
           import("../dashboad/pages/scrolling/scrolling.module").then(
             (m) => m.ScrollingModule
           )
-      }
+      },
+      {
+        path: "backno",
+        loadChildren: () =>
+          import("../dashboad/pages/backno/backno.module").then(
+            (m) => m.BacknoModule
+          )
+      },
+      
     ],
   },
 ];
 
 @NgModule({
-  declarations: [DashboadComponent, DashbordLayoutComponent, NavbarComponent],
+  declarations: [DashboadComponent, DashbordLayoutComponent, NavbarComponent,],
   imports: [
     CommonModule,
     FormsModule,

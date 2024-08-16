@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { generateUserId, generateUBId } = require('./redis');
+const { generateUBId, generateUId } = require('./redis');
 
 const mergeSchema = new mongoose.Schema({
   UBID: {
@@ -32,78 +32,59 @@ const mergeSchema = new mongoose.Schema({
 
 mergeSchema.pre('save', async function (next) {
   const merge = this;
+  const maxRetries = 5;
+  let retryCount = 0;
 
-  if (merge.isNew) {
+  const generateUId = async () => {
+    if (retryCount >= maxRetries) {
+      return next(new Error(`Failed to generate unique userId after ${maxRetries} retries`));
+    }
+
     try {
-      const existingUser = await mongoose.models.Merge.findOne({
-        username: merge.username,
-        business: merge.business
-      });
-
-      if (existingUser) {
-        return next(new Error('User with the same username and business already exists'));
-      }
-
+      
       if (!merge.userId) {
-        merge.userId = await generateUserId(merge.business.toString());
+        merge.userId = await generateUId(merge.business.toString());
+
+          const existingUser = await mongoose.models.Merge.findOne({
+          business: merge.business,
+          userId: merge.userId
+        });
+
+        if (existingUser) {
+            retryCount++;
+          merge.userId = await generateUId(merge.business.toString(), `-${retryCount.toString().padStart(2, '0')}`);
+          await generateUId();  
+        }
       }
 
-      if (!merge.UBID) {
+           if (!merge.UBID) {
         merge.UBID = await generateUBId();
       }
 
       next();
     } catch (err) {
-      return next(err);
+      if (err.code === 11000) {
+               retryCount++;
+        console.warn(`Duplicate key error encountered. Retrying ${retryCount}/${maxRetries}...`);
+        merge.userId = await generateUId(merge.business.toString(), `-${retryCount.toString().padStart(2, '0')}`);
+        await generateUId();  
+      } else {
+        next(err);
+      }
     }
+  };
+
+  if (merge.isNew) {
+    await generateUId();
   } else {
     next();
   }
-});mergeSchema.pre('save', async function (next) {
-    const merge = this;
-    const maxRetries = 5; 
-    let retryCount = 0;
-  
-    const saveWithRetries = async () => {
-      if (merge.isNew) {
-        try {
-          const existingUser = await mongoose.models.Merge.findOne({
-            username: merge.username,
-            business: merge.business
-          });
-  
-          if (existingUser) {
-            return next(new Error('User with the same username and business already exists'));
-          }
-  
-          if (!merge.userId) {
-            merge.userId = await generateUserId(merge.business.toString());
-          }
-  
-          if (!merge.UBID) {
-            merge.UBID = await generateUBId();
-          }
-  
-          await merge.save();
-          next();
-        } catch (err) {
-          if (err.code === 11000 && retryCount < maxRetries) { 
-            retryCount++;
-            console.warn(`Duplicate key error encountered. Retrying ${retryCount}/${maxRetries}...`);
-            merge.userId = await generateUserId(merge.business.toString()); 
-            await saveWithRetries();
-          } else {
-            return next(err);
-          }
-        }
-      } else {
-        next();
-      }
-    };
-  
-    saveWithRetries();
-  });
-  
+});
+
 
 const Merge = mongoose.model('Merge', mergeSchema);
 module.exports = Merge;
+
+
+
+

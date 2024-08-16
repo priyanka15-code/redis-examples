@@ -1,21 +1,19 @@
 import { Component, OnInit } from '@angular/core';
-import { LoginService } from 'src/app/login.service';
 import { forkJoin } from 'rxjs';
+import { LoginService } from 'src/app/login.service';
 
 @Component({
-  selector: 'app-user-requests',
-  templateUrl: './user-requests.component.html',
-  styleUrls: ['./user-requests.component.css']
+  selector: 'app-backno',
+  templateUrl: './backno.component.html',
+  styleUrls: ['./backno.component.css']
 })
-export class UserRequestsComponent implements OnInit {
-  merge: any[] = [];
+export class BacknoComponent implements OnInit{
   businessIds: any[] = [];
   selectedBusinessId: string = '';
   showToast: boolean = false;
   toastMessage: string = '';
   toastType: 'success' | 'error' = 'success';
   businessNameMap: { [id: string]: { name: string, id: string } } = {}; 
-   isModalOpen = false;
   userData = {
     userId: '',
     username: '',
@@ -23,25 +21,23 @@ export class UserRequestsComponent implements OnInit {
     email: '',
     businessId: ''
   };
-  filteredUsers: any[] = [];
+   isModalOpen = false;
 
-  constructor(private api: LoginService) {}
+   constructor(private api: LoginService) {}
 
-  ngOnInit(): void {
+   ngOnInit(): void {
     this.loadInitialData();
   }
 
   loadInitialData(): void {
     forkJoin([this.api.getBusiness(), this.api.getMerge()]).subscribe({
-      next: ([businessIds, merge]) => {
+      next: ([businessIds]) => {
         this.businessIds = businessIds;
-        this.merge = merge;
-        this.createBusinessNameMap();
       },
       error: (err) => this.showError(err)
     });
   }
-  handleFormSubmission(formData: any): void {
+   handleFormSubmission(formData: any): void {
     this.userData.businessId = formData.businessId; 
     this.userData.userId = formData.userId;
     this.userData.password = formData.password;
@@ -61,7 +57,6 @@ export class UserRequestsComponent implements OnInit {
     this.api.registerback(registrationData).subscribe({
       next: () => {
         this.showToastMessage('Registration Successful', 'success');
-        this.loadInitialData(); 
         this.closeModal();      
       },
       error: (err) => this.showError(err)
@@ -69,46 +64,7 @@ export class UserRequestsComponent implements OnInit {
   }
   
 
-  triggerRequests(): void {
-    this.api.processRequests().then(() => {
-      this.showToastMessage('Request Sent', 'success');
-      this.loadInitialData(); 
-    }).catch(err => {
-      this.showError(err);
-    });
-  }
-  
-
-  filterUsers(): void {
-    if (this.selectedBusinessId) {
-      this.api.filterByBusiness(this.selectedBusinessId).subscribe({
-        next: (filteredUsers) => {
-          this.merge = filteredUsers;
-          
-        },
-        error: (err) => this.showError(err)
-      });
-    } else {
-      this.loadInitialData();
-    }
-  }
-  
- createBusinessNameMap(): void {
-  this.businessNameMap = this.businessIds.reduce((map, business) => {
-    map[business._id] = {
-      name: business.businessname,
-      id: business._id
-    };
-    return map;
-  }, {});
-}
-
-
-getBusinessName(businessId: string): { name: string, id: string } {
-  return this.businessNameMap[businessId] || { name: 'Unknown Business', id: 'Unknown ID' };
-}
-
-  showToastMessage(message: string, type: 'success' | 'error'): void {
+   showToastMessage(message: string, type: 'success' | 'error'): void {
     this.toastMessage = message;
     this.toastType = type;
     this.showToast = true;
@@ -127,4 +83,6 @@ getBusinessName(businessId: string): { name: string, id: string } {
   closeModal(): void {
     this.isModalOpen = false;
   }
+
+
 }

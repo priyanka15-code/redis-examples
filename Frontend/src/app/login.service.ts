@@ -45,10 +45,18 @@ export class LoginService {
     return this.http.post<{ message: string }>(`${this.apiUrl}auth/register`, { username, password, email });
   }
 
-  registerbusiness(username: string, password: string, email: string, _id: string, userId?: string): Observable<{ message: string }> {
-    return this.http.post<{ message: string }>(`${this.apiUrl}merge/register`, { username, password, email, business: _id, userId });
+  registerbusiness(data: { username: string; password: string; email: string; business: string }): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}merge/register`, data);
+  }
+
+  registerback(data: { username: string; password: string; email: string; business: string }): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}back/register`, data);
   }
   
+  filterByBusiness(businessId: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}merge/filterByBusiness/${businessId}`);
+}
+
   
   
   
@@ -172,9 +180,7 @@ export class LoginService {
     console.log('All requests sent.');
   }
 
-  filterByBusiness(businessId: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}merge/filterByBusiness/${businessId}`);
-  }
+  
   getUsersPaginated(page: number, limit: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}users/get?page=${page}&limit=${limit}`);
   }

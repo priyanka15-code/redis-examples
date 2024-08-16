@@ -1,7 +1,6 @@
 
 const redis = require('redis');
 const moment = require('moment');
-
 const initRedisClient = async () => {
   console.log("Initializing Redis client");
   const client = redis.createClient({
@@ -11,6 +10,10 @@ const initRedisClient = async () => {
     }
   });
 
+
+  /* redisClient.getAsync = promisify(redisClient.get).bind(redisClient);
+redisClient.setAsync = promisify(redisClient.set).bind(redisClient);
+redisClient.incrAsync = promisify(redisClient.incr).bind(redisClient); */
   await client.connect();
   console.log("Client connected");
 
@@ -27,6 +30,8 @@ const initRedisClient = async () => {
 
 const generateId = async (keyPrefix, businessId = '') => {
   const redisClient = await initRedisClient();
+  console.log("generateId");
+  
 
   try {
     const counterKey = businessId ? `${businessId}:${keyPrefix}IdCounter` : `${keyPrefix}IdCounter`;
@@ -39,13 +44,42 @@ const generateId = async (keyPrefix, businessId = '') => {
     const paddedCounter = String(counter).padStart(5, '0');
     const date = moment().format('YYYYMMDD');
     const time = moment().format('HHmmssSSS');
-    const id = `${keyPrefix}-T${paddedCounter}-${date}-${time}`;
+    const id = `${keyPrefix}-T${paddedCounter}`;
 
     return id;
   } finally {
     await redisClient.quit();
   }
 };
+const generateUId = async (businessId, suffix = '') => {
+  const redisClient = await initRedisClient();
+  console.log("hello");
+
+  try {
+    const counterKey = businessId ? `${businessId}:UIdCounter` : 'UIdCounter';
+    const counter = await redisClient.incr(counterKey);  
+    if (counter === null) {
+      throw new Error('Failed to increment counter');
+    }
+
+    const paddedCounter = String(counter).padStart(5, '0');
+    let userId = `${paddedCounter}${suffix}`;
+    
+    
+    /* let suffixCounter = 0;
+    while (await redisClient.get(`userId:${userId}`)) {  
+      suffixCounter += 1;
+      const formattedSuffix = suffixCounter.toString().padStart(2, '0');
+      userId = `${paddedCounter}-${formattedSuffix}`;
+    }
+ */
+    return userId;
+  } finally {
+    await redisClient.quit();
+  }
+};
+
+
 
 const generateUserId = async (businessId) => generateId('U', businessId);
 const generateBusinessId = async () => generateId('B');
@@ -69,7 +103,7 @@ const checkUserInCache = async (username) => {
 };
 
 
-module.exports = { initRedisClient, generateUserId, generateBusinessId, generateUBId, cacheUser, checkUserInCache };
+module.exports = { initRedisClient, generateUserId, generateBusinessId,generateUId, generateUBId, cacheUser, checkUserInCache };
 
 
 /* const generateUserId = async () => {
