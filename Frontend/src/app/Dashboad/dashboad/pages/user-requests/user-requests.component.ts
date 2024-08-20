@@ -32,7 +32,7 @@ export class UserRequestsComponent implements OnInit {
   }
 
   loadInitialData(): void {
-    forkJoin([this.api.getBusiness(), this.api.getMerge()]).subscribe({
+    forkJoin([this.api.getBusiness(),this.api.getback(), this.api.getMerge()]).subscribe({
       next: ([businessIds, merge]) => {
         this.businessIds = businessIds;
         this.merge = merge;
@@ -128,3 +128,6 @@ getBusinessName(businessId: string): { name: string, id: string } {
     this.isModalOpen = false;
   }
 }
+
+
+

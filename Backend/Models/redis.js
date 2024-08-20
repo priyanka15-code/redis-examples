@@ -1,5 +1,9 @@
 
 const redis = require('redis');
+const Redis = require('ioredis');
+
+const { promisify } = require('util');
+
 const moment = require('moment');
 const initRedisClient = async () => {
   console.log("Initializing Redis client");
@@ -10,10 +14,11 @@ const initRedisClient = async () => {
     }
   });
 
+// Promisify Redis commands
 
-  /* redisClient.getAsync = promisify(redisClient.get).bind(redisClient);
-redisClient.setAsync = promisify(redisClient.set).bind(redisClient);
-redisClient.incrAsync = promisify(redisClient.incr).bind(redisClient); */
+/* client.lPush = promisify(client.lPush).bind(client);
+
+ */  
   await client.connect();
   console.log("Client connected");
 
@@ -44,7 +49,7 @@ const generateId = async (keyPrefix, businessId = '') => {
     const paddedCounter = String(counter).padStart(5, '0');
     const date = moment().format('YYYYMMDD');
     const time = moment().format('HHmmssSSS');
-    const id = `${keyPrefix}-T${paddedCounter}`;
+    const id = `${keyPrefix}-T${paddedCounter}-${date}-${time}`;
 
     return id;
   } finally {

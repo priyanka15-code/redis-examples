@@ -44,6 +44,15 @@ router.post('/register', (req, res) => {
     });
 });
 
+router.get('/get', async (req, res) => {
+  try {
+    const back = await Back.find();
+    res.json(back);
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 module.exports = router;
 
 

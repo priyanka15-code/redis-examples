@@ -9,7 +9,9 @@ const backSchema = new mongoose.Schema({
   },
   userId: {
     type: String,
-    unique: true 
+    unique: function() {
+      return this.userId !== '';
+    }
   },
   username: {
     type: String,
@@ -29,37 +31,38 @@ const backSchema = new mongoose.Schema({
     required: true
   }
 });
+backSchema.index({ userId: 1 }, { unique: true, partialFilterExpression: { userId: { $ne: '' } } });
+
 
 backSchema.pre('save', async function (next) {
-    const redisClient = await initRedisClient();
-  
-    try {
-      // If no userId is provided, generate a new one
-      if (!this.userId) {
-        this.userId = await generateUId(this.business);
-  
+  const redisClient = await initRedisClient();
+
+  try {
+    
+    if (this.userId && this.userId.trim() !== '') {
+      
+      const existingUser = await redisClient.get(`userId:${this.userId}`);
+      if (existingUser) {
         
-        if (!this.userId) {
-          throw new Error('Failed to generate a valid userId');
-        }
-      } else {
-        const existingUser = await redisClient.get(`userId:${this.userId}`);
-        if (existingUser) {
-          let suffix = await redisClient.incr(`userIdSuffix:${this.userId}`);
-          this.userId = `${this.userId}-${suffix}`;
-        }
+        let suffix = await redisClient.incr(`userIdSuffix:${this.userId}`);
+        this.userId = `${this.userId}-${suffix}`;
       }
-  
-      // Store the userId in Redis to ensure uniqueness across all sessions
+      
       await redisClient.set(`userId:${this.userId}`, '1');
-  
-      next();
-    } catch (err) {
-      next(err);
-    } finally {
-      await redisClient.quit();
+    }else {
+      
+      console.log('userId is blank or undefined, skipping Redis operations.');
     }
-  });
+
+    next();
+  } catch (err) {
+    next(err);
+  } finally {
+    await redisClient.quit();
+  }
+});
+
+
   
 
 
