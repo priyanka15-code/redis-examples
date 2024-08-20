@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { generateUId, initRedisClient } = require('./redis');
+const {  initRedisClient } = require('./redis');
 
 const backSchema = new mongoose.Schema({
   UBID: {
@@ -9,9 +9,7 @@ const backSchema = new mongoose.Schema({
   },
   userId: {
     type: String,
-    unique: function() {
-      return this.userId !== '';
-    }
+   default: '',
   },
   username: {
     type: String,
@@ -31,37 +29,32 @@ const backSchema = new mongoose.Schema({
     required: true
   }
 });
-backSchema.index({ userId: 1 }, { unique: true, partialFilterExpression: { userId: { $ne: '' } } });
 
 
 backSchema.pre('save', async function (next) {
   const redisClient = await initRedisClient();
 
-  try {
-    
-    if (this.userId && this.userId.trim() !== '') {
-      
-      const existingUser = await redisClient.get(`userId:${this.userId}`);
-      if (existingUser) {
-        
-        let suffix = await redisClient.incr(`userIdSuffix:${this.userId}`);
-        this.userId = `${this.userId}-${suffix}`;
+  
+    try {
+      if (!this.userId || this.userId.trim() === '') {
+          this.userId = ''; 
+          
+      } else {
+          const existingUser = await redisClient.get(`userId:${this.business}:${this.userId}`);
+          if (existingUser) {
+              let suffix = await redisClient.incr(`userIdSuffix:${this.business}:${this.userId}`);
+              this.userId = `${this.userId}-${suffix}`;
+          }
+          await redisClient.set(`userId:${this.business}:${this.userId}`, '1');
       }
-      
-      await redisClient.set(`userId:${this.userId}`, '1');
-    }else {
-      
-      console.log('userId is blank or undefined, skipping Redis operations.');
-    }
 
-    next();
+      next();
   } catch (err) {
     next(err);
   } finally {
     await redisClient.quit();
   }
 });
-
 
   
 

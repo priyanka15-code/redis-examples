@@ -93,7 +93,7 @@ const checkUserInCache = async (username) => {
 
 (async () => {
   // Generate a new user ID
-  const newUserId = await generateUserId('B-T00042-20240801-131433');
+  const newUserId = await generateUserId('business0_1723803240909');
   console.log('Generated User ID:', newUserId);
 
   // Cache a user
@@ -115,27 +115,34 @@ const checkUserInCache = async (username) => {
   const userIds = await client.sendCommand(['LRANGE', 'userIds', '0', '-1']);
   console.log('User IDs:', userIds); */
   // Set multiple cache keys with a TTL of 30 seconds
-  await client.sendCommand(['SETEX', 'user:123:profile', 30, JSON.stringify({ name: 'abc', email: 'abc@example.com' })]);
+ /*  await client.sendCommand(['SETEX', 'user:123:profile', 30, JSON.stringify({ name: 'abc', email: 'abc@example.com' })]);
   await client.sendCommand(['SETEX', 'user:456:profile', 30, JSON.stringify({ name: 'abc', email: 'abc@example.com' })]);
-
+ */
   // Refresh multiple cache keys after 20 seconds
-  setTimeout(async () => {
-    try {
-      const data = await client.sendCommand(['MGET', 'user:123:profile', 'user:456:profile']);
-      const userData = data.map((item) => item ? JSON.parse(item) : null);
+  // Refresh multiple cache keys after 20 seconds
+setTimeout(async () => {
+  try {
+    // Get current user data
+    const user123 = await client.hGetAll('user:123:profile');
+    const user456 = await client.hGetAll('user:456:profile');
 
-      userData.forEach((user) => {
-        if (user) user.updated = true;
-      });
+    // Parse and update user data
+    const userData = [user123, user456].map((data) => {
+      return Object.keys(data).length ? JSON.parse(data) : null;
+    });
 
-      await client.sendCommand(['MSET', 
-        'user:123:profile', JSON.stringify(userData[0]),
-        'user:456:profile', JSON.stringify(userData[1])
-      ]);
-    } catch (err) {
-      console.error('Error refreshing cache:', err);
-    }
-  }, 20000);
+    userData.forEach((user) => {
+      if (user) user.updated = true;
+    });
+
+    // Update cache with new data
+    await client.hSet('user:123:profile', userData[0]);
+    await client.hSet('user:456:profile', userData[1]);
+  } catch (err) {
+    console.error('Error refreshing cache:', err);
+  }
+}, 20000);
+
 
   // Close Redis connection
   await client.quit();
