@@ -57,8 +57,21 @@ export class LoginService {
     return this.http.get(`${this.apiUrl}merge/filterByBusiness/${businessId}`);
 }
 
-  
-  
+createTask(task: any) {
+  return this.http.post(`${this.apiUrl}test/tasks`, task);
+}
+
+updateTask(task: any) {
+  return this.http.put(`${this.apiUrl}test/tasks/${task._id}`, task);
+}
+
+deleteTask(task: any) {
+  return this.http.delete(`${this.apiUrl}test/tasks/${task._id}`);
+}
+
+undo(task: any) {
+  return this.http.post(`${this.apiUrl}test/undo`, { task});
+}
   
 
   logout(): void {

@@ -16,7 +16,7 @@ const sendBatchRequests = async (businessIds, numRequestsPerBusiness, endpoint, 
 
       // Ensure unique user ID is used for each request
       if (endpoint.includes('register')) {
-        payload = ensureUniqueUserId(payload);  // Update payload with unique userId
+        payload = ensureUniqueUserId(payload); 
       }
       
       // Debugging: Print payload to verify its format
@@ -78,8 +78,4 @@ const ensureUniqueUserId = (payload) => {
   }
 })();
 
-/* Done Task:
-
-- Work with Kuldip on the redis generating unique back numbes and it's sequences. all work is done
-- now what is my next Task
-Good evening! */
+/*  */

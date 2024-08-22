@@ -1,88 +1,45 @@
 import { Component, OnInit } from '@angular/core';
-import { forkJoin } from 'rxjs';
-import { LoginService } from 'src/app/login.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-backno',
-  templateUrl: './backno.component.html',
+  templateUrl: `./backno.component.html`,
   styleUrls: ['./backno.component.css']
 })
-export class BacknoComponent implements OnInit{
-  businessIds: any[] = [];
-  selectedBusinessId: string = '';
-  showToast: boolean = false;
-  toastMessage: string = '';
-  toastType: 'success' | 'error' = 'success';
-  businessNameMap: { [id: string]: { name: string, id: string } } = {}; 
-  userData = {
-    userId: '',
-    username: '',
-    password: '',
-    email: '',
-    businessId: ''
-  };
-   isModalOpen = false;
+export class BacknoComponent implements OnInit {
+  task: any = [];
+  taskId: string = '';
+  error: string = '';
 
-   constructor(private api: LoginService) {}
+  constructor(private http: HttpClient) { }
 
-   ngOnInit(): void {
-    this.loadInitialData();
+  ngOnInit(): void {
   }
 
-  loadInitialData(): void {
-    forkJoin([this.api.getBusiness(), this.api.getMerge()]).subscribe({
-      next: ([businessIds]) => {
-        this.businessIds = businessIds;
-      },
-      error: (err) => this.showError(err)
-    });
-  }
-   handleFormSubmission(formData: any): void {
-    this.userData.businessId = formData.businessId; 
-    this.userData.userId = formData.userId;
-    this.userData.password = formData.password;
-    this.userData.email = formData.email;
-    this.userData.username = formData.username;
-    this.register(); 
-  }
-  register(): void {
-    const registrationData = {
-      userId: this.userData.userId,
-      username: this.userData.username,
-      password: this.userData.password,
-      email: this.userData.email,
-      business: this.userData.businessId 
-    };
-  
-    this.api.registerback(registrationData).subscribe({
-      next: () => {
-        this.showToastMessage('Registration Successful', 'success');
-        this.closeModal();      
-      },
-      error: (err) => this.showError(err)
-    });
-  }
-  
-
-   showToastMessage(message: string, type: 'success' | 'error'): void {
-    this.toastMessage = message;
-    this.toastType = type;
-    this.showToast = true;
-    setTimeout(() => this.showToast = false, 3000);
+  createTask(): void {
+    this.http.post('http://localhost:3000/api/test/tasks', this.task)
+      .subscribe((response: any) => {
+        this.taskId = response.taskId;
+      }, (error: any) => {
+        this.error = error.error;
+      });
   }
 
-  showError(err: any): void {
-    console.error(err);
-    this.showToastMessage('An error occurred', 'error');
+  undoTask(): void {
+    this.http.post('http://localhost:3000/api/tasks/undo', {})
+      .subscribe((response: any) => {
+        /* this.taskId = null; */
+      }, (error: any) => {
+        this.error = error.error;
+      });
   }
 
-  openModal(): void {
-    this.isModalOpen = true;
+  confirmTask(): void {
+    this.http.post('http://localhost:3000/api/tasks/confirm', {})
+      .subscribe((response: any) => {
+       /*  this.taskId = null; */
+      }, (error: any) => {
+        this.error = error.error;
+      });
   }
-
-  closeModal(): void {
-    this.isModalOpen = false;
-  }
-
-
 }

@@ -43,16 +43,26 @@ export class LoginComponent implements OnInit {
         this.showToastMessage('Registration Successful', 'success');
       },
       error: (err) => {
-        this.showToastMessage('Registration Failed', 'error');
+        this.showToastMessage('Registration Failed. <button (click)="undo()">Undo</button>', 'error', this.undo.bind(this));
         console.error(err);
       }
     });
   }
 
-  showToastMessage(message: string, type: 'success' | 'error'): void {
+  undo(): void {
+    this.showLogin = false;
+  }
+
+  showToastMessage(message: string, type: 'success' | 'error', undoCallback?: () => void): void {
     this.toastMessage = message;
     this.toastType = type;
     this.showToast = true;
-    setTimeout(() => this.showToast = false, 3000);
+  
+    if (undoCallback) {
+      this.toastMessage ;
+    }
+  
+    setTimeout(() => this.showToast = false, 5000);
   }
+  
 }

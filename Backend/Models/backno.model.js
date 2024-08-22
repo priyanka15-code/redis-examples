@@ -43,7 +43,7 @@ backSchema.pre('save', async function (next) {
           const existingUser = await redisClient.get(`userId:${this.business}:${this.userId}`);
           if (existingUser) {
               let suffix = await redisClient.incr(`userIdSuffix:${this.business}:${this.userId}`);
-              this.userId = `${this.userId}-${suffix}`;
+              this.userId = `${this.userId}_${suffix}`;
           }
           await redisClient.set(`userId:${this.business}:${this.userId}`, '1');
       }

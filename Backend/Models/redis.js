@@ -74,6 +74,36 @@ const generateUserId = async (businessId) => generateId('U', businessId);
 const generateBusinessId = async () => generateId('B');
 const generateUBId = async () => generateId('UB');
 
+const storeFailedRegistration = async (user) => {
+  const redisClient = await initRedisClient();
+  const key = `failed:${user.username}:${user.email}`;
+  
+  try {
+    await redisClient.hSet(key, {
+      userId: user.userId,
+      username: user.username,
+      email: user.email,
+      error: user.error,
+    });
+    await redisClient.expire(key, 3600); 
+  } catch (err) {
+    console.error('Error storing failed registration:', err);
+    throw err;
+  }
+};
+const getFailedRegistration = async (username, email) => {
+  const redisClient = await initRedisClient();
+  const key = `failed:${username}:${email}`;
+  
+  try {
+    const data = await redisClient.hGetAll(key);
+    return data;
+  } catch (err) {
+    console.error('Error getting failed registration:', err);
+    throw err;
+  }
+};
+
 
 
 // Cache user in Redis
@@ -91,8 +121,19 @@ const checkUserInCache = async (username) => {
   return user ? JSON.parse(user) : null;
 };
 
+const RATE_LIMIT_WINDOW = 15 * 60;  
+const MAX_ATTEMPTS = 5;
 
-module.exports = { initRedisClient, generateUserId, generateBusinessId,generateUId, generateUBId, cacheUser, checkUserInCache };
+const loginRateLimiter = async (key) => {
+  const attempts = await redisClient.incr(key);
+
+  if (attempts === 1) {
+    await redisClient.expire(key, RATE_LIMIT_WINDOW);
+  }
+
+  return attempts;
+};
+module.exports = { initRedisClient, generateUserId, generateBusinessId, loginRateLimiter,getFailedRegistration, generateUId, storeFailedRegistration,generateUBId, cacheUser, checkUserInCache };
 
 
 /* const generateUserId = async () => {

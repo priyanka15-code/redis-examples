@@ -14,7 +14,7 @@ app.use(cors());
 
 (async () => {
   try {
-    await mongoose.connect('mongodb://localhost:27017/testing', {
+    await mongoose.connect('mongodb://localhost:27017/testing?retryWrites=true', {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
@@ -28,14 +28,16 @@ app.use(cors());
     const businessRoute = require('./Routes/business.routers');
     const mergeRoute = require('./Routes/mergerequest.router');
     const backRoute = require('./Routes/back.routes')
-/*     const translateRoute = require('./Routes/translate.routes');
+     const testRoute = require('./Routes/testing.routes')
+ /*     const translateRoute = require('./Routes/translate.routes');
  */
     app.use('/api/auth', authRoute);
     app.use('/api/users', userRoute);
     app.use('/api/business', businessRoute);
     app.use('/api/merge',mergeRoute);
     app.use('/api/back',backRoute);
-/*     app.use('/api/translate',translateRoute)
+     app.use('/api/test',testRoute)
+ /*     app.use('/api/translate',translateRoute)
  */
 
     app.listen(port, () => {

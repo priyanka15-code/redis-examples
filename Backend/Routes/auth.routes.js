@@ -1,7 +1,11 @@
 const express = require('express');
+const mongoose = require('mongoose');
+
 const router = express.Router();
 const jwtUtils = require('../Utils/jwt.utils');
 const jwt = require('jsonwebtoken');
+/* const { generateUserId, storeFailedRegistration, getFailedRegistration } = require('../Models/redis');
+ */
 const secret = process.env.SECRET_KEY;
 
 module.exports = () => {
@@ -49,7 +53,7 @@ module.exports = () => {
     });
   });
 
-  router.post('/register', async (req, res) => {
+   router.post('/register', async (req, res) => {
     const { username, password, email } = req.body;
     const user = new User({ username, password, email });
     try {
@@ -59,7 +63,54 @@ module.exports = () => {
       console.error('Error creating user:', err);
       res.status(400).json({ message: 'Error creating user', error: err.message });
     }
+  }); 
+  /* router.post('/register', async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+  
+    const { username, password, email } = req.body; // Define here
+  
+    try {
+      let userId = await generateUserId();
+  
+      const failedRegistration = await getFailedRegistration(username, email);
+      if (failedRegistration) {
+        userId = failedRegistration.userId;
+      }
+  
+      const user = new User({
+        userId,
+        username,
+        password,
+        email,
+      });
+  
+      await user.save({ session });
+  
+      await session.commitTransaction();
+      session.endSession();
+  
+      res.json({ message: 'User created successfully' });
+  
+    } catch (err) {
+      await session.abortTransaction();
+      session.endSession();
+  
+      const userId = await generateUserId();
+      await storeFailedRegistration({
+        userId,
+        username,
+        email,
+        error: err.message
+      });
+  
+      res.status(400).json({ message: 'Error creating user', error: err.message });
+    }
   });
+   */
 
   return router;
 };
+
+
+
