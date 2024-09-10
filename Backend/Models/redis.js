@@ -121,43 +121,33 @@ const checkUserInCache = async (username) => {
   return user ? JSON.parse(user) : null;
 };
 
-const RATE_LIMIT_WINDOW = 15 * 60;  
-const MAX_ATTEMPTS = 5;
+const RATE_LIMIT_WINDOW = 15 * 60; 
+const MAX_ATTEMPTS = 5;  
 
-const loginRateLimiter = async (key) => {
-  const attempts = await redisClient.incr(key);
-
-  if (attempts === 1) {
-    await redisClient.expire(key, RATE_LIMIT_WINDOW);
-  }
-
-  return attempts;
-};
-module.exports = { initRedisClient, generateUserId, generateBusinessId, loginRateLimiter,getFailedRegistration, generateUId, storeFailedRegistration,generateUBId, cacheUser, checkUserInCache };
-
-
-/* const generateUserId = async () => {
+const loginRateLimiter = async (username) => {
   const redisClient = await initRedisClient();
+  const key = `login_attempts:${username}`;
 
   try {
-    // Atomic increment operation
-    const counter = await redisClient.incr('userIdCounter');
+    const attempts = await redisClient.incr(key);
 
-    if (counter === null) {
-      throw new Error('Failed to increment counter');
+    if (attempts === 1) {
+      await redisClient.expire(key, RATE_LIMIT_WINDOW);
     }
 
-    // Format the counter and create the user ID
-    const paddedCounter = String(counter).padStart(5, '0');
-    const date = moment().format('YYYYMMDD');
-    const time = moment().format('HHmmss');
-    const userId = `T${paddedCounter}-${date}-${time}`;
+    if (attempts > MAX_ATTEMPTS) {
+      return {
+        blocked: true,
+        attempts,
+      };
+    }
 
-    return userId;
+    return {
+      blocked: false,
+      attempts,
+    };
   } finally {
     await redisClient.quit();
   }
 };
-
-
- */
+module.exports = { initRedisClient, generateUserId, generateBusinessId, loginRateLimiter,getFailedRegistration, generateUId, storeFailedRegistration,generateUBId, cacheUser, checkUserInCache };

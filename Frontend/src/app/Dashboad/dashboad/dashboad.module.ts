@@ -21,16 +21,16 @@ const routes: Routes = [
           ),
       },
       {
-        path: "business",
+        path: "business-request",
         loadChildren: () =>
           import("../dashboad/pages/business-requests/business-requests.module").then(
             (m) => m.BusinessModule
           ),
       },
       {
-        path: "UB",
+        path: "backnoex",
         loadChildren: () =>
-          import("../dashboad/pages/user-requests/user-request.module").then(
+          import("./pages/backno-example/user-request.module").then(
             (m) => m.UserRequestModule
           ),
       },
@@ -42,9 +42,9 @@ const routes: Routes = [
           )
       },
       {
-        path: "backno",
+        path: "undoex",
         loadChildren: () =>
-          import("../dashboad/pages/backno/backno.module").then(
+          import("./pages/undoex/backno.module").then(
             (m) => m.BacknoModule
           )
       },

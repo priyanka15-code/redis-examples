@@ -12,9 +12,9 @@ export class ModelComponent {
   @Output() submitFormEvent = new EventEmitter<any>();
 
   form = {
-    username: '',
-    password: '',
-    email: '',
+    username: 'xyz',
+    password: '1234',
+    email: 'xyz@gmail.com',
     businessId: '', 
     userId: ''
   };

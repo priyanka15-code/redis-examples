@@ -8,7 +8,7 @@ import { LoginService } from '../login.service';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
-  username: string = 'abcw';
+  username: string = 'abcwx';
   password: string = '1234';
   email: string = 'abc@gmail.com';
   showLogin: boolean = true;
