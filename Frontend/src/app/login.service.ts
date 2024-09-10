@@ -57,22 +57,35 @@ export class LoginService {
     return this.http.get(`${this.apiUrl}merge/filterByBusiness/${businessId}`);
 }
 
-createTask(task: any) {
+getTasks(): Observable<any[]> {
+  return this.http.get<any[]>(`${this.apiUrl}test/tasks`);
+}
+
+
+createTaskredis(task: any): Observable<any> {
   return this.http.post(`${this.apiUrl}test/tasks`, task);
 }
 
-updateTask(task: any) {
+updateTask(task: any): Observable<any> {
   return this.http.put(`${this.apiUrl}test/tasks/${task._id}`, task);
 }
 
-deleteTask(task: any) {
-  return this.http.delete(`${this.apiUrl}test/tasks/${task._id}`);
+undo(username: string, email: string): Observable<any> {
+  return this.http.post(`${this.apiUrl}test/undo`, { username, email });
 }
-
-undo(task: any) {
-  return this.http.post(`${this.apiUrl}test/undo`, { task});
-}
+    // Create a new task
+    createTask(task: { title: string; completed: boolean }): Observable<any> {
+      return this.http.post(`${this.apiUrl}test/tasks`, task);
+    }
   
+    // Undo task creation
+   /*  undoTask(taskId: string): Observable<any> {
+      return this.http.post(`${this.apiUrl}test/tasks/undo`, {});
+    } */
+      undoTask(taskId: string): Observable<any> {
+        return this.http.post(`${this.apiUrl}test/tasks/undo`, { taskId });
+      }
+      
 
   logout(): void {
     this.cookieService.delete(this.cookieKey);

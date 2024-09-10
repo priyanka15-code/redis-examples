@@ -7,7 +7,7 @@ const failedTaskSchema = new mongoose.Schema({
   },
   completed: {
     type: Boolean,
-    required: true
+    required: false
   },
   error: {
     type: String,

@@ -1,4 +1,5 @@
 const express = require('express');
+const session = require('express-session');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -11,10 +12,15 @@ const port = 3000;
 
 app.use(bodyParser.json());
 app.use(cors());
+app.use(session({
+   secret: 'keyboard',
+  resave: false,
+  saveUninitialized: true,
+}));
 
 (async () => {
   try {
-    await mongoose.connect('mongodb://localhost:27017/testing?retryWrites=true', {
+    await mongoose.connect('mongodb+srv://vcT3ACS7QRuX76bp:vcT3ACS7QRuX76bp@cluster0.vrpc25w.mongodb.net/testing', {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
@@ -36,7 +42,7 @@ app.use(cors());
     app.use('/api/business', businessRoute);
     app.use('/api/merge',mergeRoute);
     app.use('/api/back',backRoute);
-     app.use('/api/test',testRoute)
+    app.use('/api/test',testRoute)
  /*     app.use('/api/translate',translateRoute)
  */
 

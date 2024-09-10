@@ -68,7 +68,7 @@ module.exports = () => {
     const session = await mongoose.startSession();
     session.startTransaction();
   
-    const { username, password, email } = req.body; // Define here
+    const { username, password, email } = req.body; 
   
     try {
       let userId = await generateUserId();
