@@ -35,14 +35,15 @@ app.use(session({
     const mergeRoute = require('./Routes/mergerequest.router');
     const backRoute = require('./Routes/back.routes')
      const testRoute = require('./Routes/testing.routes')
+     const undologinRoute = require('./Routes/login.routers');
  
     app.use('/api/auth', authRoute);
     app.use('/api/users', userRoute);
     app.use('/api/business', businessRoute);
     app.use('/api/merge',mergeRoute);
     app.use('/api/back',backRoute);
-    app.use('/api/test',testRoute)
- 
+    app.use('/api/test',testRoute);
+    app.use('/api/undo',undologinRoute);
 
     app.listen(port, () => {
       console.log(`Server started on port ${port}`);

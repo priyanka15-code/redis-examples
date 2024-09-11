@@ -1,24 +1,24 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const failedTaskSchema = new mongoose.Schema({
   title: {
     type: String,
-    required: true
+    required: true,
   },
   completed: {
     type: Boolean,
-    required: false
+    required: false,
   },
   error: {
     type: String,
-    required: true
+    required: true,
   },
   createdAt: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
 
-const FailedTask = mongoose.model('FailedTask', failedTaskSchema);
+const FailedTask = mongoose.model("FailedTask", failedTaskSchema);
 
 module.exports = FailedTask;
